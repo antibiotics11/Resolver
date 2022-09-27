@@ -1,0 +1,8 @@
+# TTL
+TTL	3600
+
+# IPv4 Record
+A	127.0.0.1
+
+# IPv6 Record
+AAAA	::1
