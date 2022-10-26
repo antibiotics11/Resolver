@@ -1,12 +1,12 @@
 <?php
 
-namespace Resolver\Packet;
+namespace Resolver;
 
-class DnsPacket {
+class Packet {
 
-	/** Parse packet and return DnsHeader object */
-	public static function parse(String $packet): DnsHeader {
 
+	public static function parse(String $packet): Header {
+	
 		$id       = bin2hex($packet[0]).bin2hex($packet[1]);
 		$flags    = bin2hex($packet[2]).bin2hex($packet[3]);
 		$flags    = sprintf("%016d", decbin(hexdec($flags)));
@@ -16,8 +16,8 @@ class DnsPacket {
 		$nscount  = bin2hex($packet[8]).bin2hex($packet[9]);
 		$arcount  = bin2hex($packet[10]).bin2hex($packet[11]);
 
-		// Packet is Response if QR is 1, Request if 0
-		$query = ((int)$flags[0]) ? new DnsAnswer() : new DnsQuery();
+		// Query is response if QR is 1, request if 0
+		$query = ((int)$flags[0]) ? new Answer() : new Query();
 		
 		$query->id           = hexdec($id);
 		
@@ -58,12 +58,11 @@ class DnsPacket {
 		$query->class  = hexdec($class);
 
 		return $query;
-
+	
 	}
-
-	/** Complete UDP Message from DnsHeader object */
-	public static function complete(DnsHeader $header): String {
-
+	
+	public static function complete(Header $header): String {
+	
 		$id     = sprintf("%04d", dechex($header->id));
 		$flags  = (String)$answer->flag_qr
 			 .(String)$answer->flag_opcode
@@ -78,6 +77,8 @@ class DnsPacket {
 		$packet;
 	
 		return $packet;
+	
 	}
+
 
 };

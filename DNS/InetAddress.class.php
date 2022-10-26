@@ -4,8 +4,10 @@ namespace Resolver;
 
 class InetAddress {
 
-	private String $address;
-	private int $version = \AF_INET;                       // Address version: 2 => IPv4, 10 => IPv6
+	
+	private String  $address;
+	private int     $version = \AF_INET;
+	
 
 	public function __construct(String $address) {
 
@@ -15,7 +17,7 @@ class InetAddress {
 		} else if (InetAddress::is_ipv6($address)) {
 			$version = \AF_INET6;
 		} else {
-			throw new \Exception($address." is not a IP Address.");
+			throw new \Exception("Invalid IP Address \"".$address."\"");
 		}
 
 		$this->address = $address;
@@ -70,5 +72,6 @@ class InetAddress {
 		return true;
 			
 	}
+	
 
 };

@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-const DNS_ADDR = "127.255.255.53";
+const DNS_ADDR = "127.100.100.53";
 const DNS_PORT = 53;
 
 $name = readline("host ==> ");
