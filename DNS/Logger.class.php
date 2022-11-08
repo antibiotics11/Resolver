@@ -4,16 +4,14 @@ namespace Resolver;
 
 class Logger {
 
-	const LOG_DIR = __DIR__."/log/";
-	
 	public static function systime(): String {
 		return substr(date(DATE_RFC2822), 0, -5).date("T");
 	}
 	
-	public static function write_log(String $message): void {
+	public static function write_log(String $dir, String $message): void {
 	
 		$time = Logger::systime();
-		$filename = Logger::LOG_DIR.date("Y-m-d").".log";
+		$filename = $dir.DIRECTORY_SEPARATOR.date("Y-m-d").".log";
 		$message = $time."\t".$message."\r\n";
 		
 		$fh = fopen($filename, "a");

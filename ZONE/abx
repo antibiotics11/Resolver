@@ -1,0 +1,17 @@
+# TTL
+TTL	3600
+
+# IPv4 Record
+A	127.100.100.1
+
+# IPv6 Record
+AAAA	::1
+
+# MX Record
+MX	smtp.abx
+
+# NS Record
+NS	ns.abx
+
+# TXT Record
+TXT	abx. is top level domain
