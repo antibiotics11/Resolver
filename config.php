@@ -1,5 +1,7 @@
 <?php
 
+/** DNS server configuration file */
+
 const DNS_SERVER_ADDR    = "127.100.100.53";   // IPv4 address
 const DNS_SERVER_ADDR6   = "::1";              // IPv6 address
 const DNS_SERVER_PORT    = 53;                 // Listening port

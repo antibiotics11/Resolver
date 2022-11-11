@@ -49,6 +49,7 @@ class Server {
 		$socket = new Socket();
 
 		$socket->create($this->address, $this->port);
+		
 		$socket->listen(function($data, $ip, $port) {
 
 			$question = Binary::parse($data);

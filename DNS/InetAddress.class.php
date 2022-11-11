@@ -36,40 +36,14 @@ class InetAddress {
 	
 	public static function is_ipv4(String $address = "127.0.0.1"): bool {
 
-		$address = explode(".", trim($address));
-
-		if (count($address) != 4) {
-			return false;
-		}
-		foreach ($address as $part) {
-			if (!is_numeric($part) || (int)$part > 255 || (int)$part < 0) {
-				return false;
-			}
-		}
-
-		return true;
+		return (filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) ? true : false;
 
 	}
 
 
 	public static function is_ipv6(String $address = "::1"): bool {
 
-		$address = explode(":", trim($address));
-	
-		if (count($address) > 8 || count($address) < 2) {
-			return false;
-		}
-		foreach ($address as $part) {
-			if (empty($part)) {
-				$part = "00";
-				continue;
-			}
-			if (!ctype_xdigit($part) || (int)hexdec($part) > 65535 || (int)hexdec($part) < 0) {
-				return false;
-			}
-		}
-
-		return true;
+		return (filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) ? true : false;
 			
 	}
 	

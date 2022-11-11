@@ -76,7 +76,8 @@ class Binary {
 			 .$header->flag_tc
 			 .$header->flag_rd
 			 .$header->flag_ra
-			 .$header->flag_z."00"
+			 .$header->flag_z
+			 ."00"
 			 .$rcode
 		;
 		$flags = chr(bindec(substr($flags, 0, 8)))
@@ -105,7 +106,7 @@ class Binary {
 				$name .= chr(strlen($level[$n]));
 				$name .= $level[$n];
 			}
-			$name .= chr(0);
+			$name .= chr(0x00);
 			
 			$type  = sprintf("%016d", decbin($header->type));
 			$type  = chr(bindec(substr($type, 0, 8)))
@@ -119,9 +120,8 @@ class Binary {
 		
 		}
 		
-		if ($header instanceof Answer) {
+		if ($header instanceof Answer && $header->ancount) {
 		
-			
 			$name = "";
 			$level = explode(".", $header->name);
 			for ($n = 0; $n < count($level); $n++) {
@@ -144,17 +144,70 @@ class Binary {
 				.chr(bindec(substr($ttl, 16, 8)))
 				.chr(bindec(substr($ttl, 24)));
 			
-			$rdlength = sprintf("%016d", decbin($header->rdlength));
+			$rdata    = Binary::rdata_to_bin($header->type, $header->rdata);
+			
+			$rdlength = sprintf("%016d", decbin(strlen($rdata)));
 			$rdlength = chr(bindec(substr($rdlength, 0, 8)))
 				   .chr(bindec(substr($rdlength, 8)));
-				   
-			$rdata    = $header->rdata;
 
 			$packet .= $name.$type.$class.$ttl.$rdlength.$rdata;
 		
 		}
 		
 		return $packet;
+	
+	}
+	
+	public static function rdata_to_bin(int $type, String $rdata): String {
+		
+		$rdata  = trim($rdata);
+		$binary = "";
+		
+		switch ($type) {
+		
+		case NameResolver::TYPE_A      :
+			$field = explode(".", $rdata);
+			for ($r = 0; $r < count($field); $r++) {
+				$binary .= chr((int)$field[$r]);
+			}
+			
+			break;
+		
+		case NameResolver::TYPE_AAAA   :
+			
+			break;
+			
+		case NameResolver::TYPE_NS     : 
+			$part = explode(".", $rdata);
+			for ($r = 0; $r < count($part); $r++) {
+				$part[$r] = trim($part[$r]);
+				$binary .= chr(strlen($part[$r]));
+				$binary .= $part[$r];
+			}
+			$binary .= chr(0x00);
+			
+			break;
+			
+		case NameResolver::TYPE_MX     :
+			$binary = chr(0x00).chr(0x0a);
+			$part   = explode(".", $rdata);
+			for ($r = 0; $r < count($part); $r++) {
+				$part[$r] = trim($part[$r]);
+				$binary .= chr(strlen($part[$r]));
+				$binary .= $part[$r];
+			}
+			$binary .= chr(0x00);
+			
+			break;
+			
+		case NameResolver::TYPE_TXT    :
+			$binary = chr(strlen($rdata)).$rdata;
+				
+			break;
+		
+		};
+		
+		return $binary;
 	
 	}
 

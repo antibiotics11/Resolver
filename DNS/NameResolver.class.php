@@ -4,12 +4,23 @@ namespace Resolver;
 
 class NameResolver {
 
-	const TYPE_A          = 1;
-	const TYPE_AAAA       = 28;
-	const TYPE_NS         = 2;
-	const TYPE_CNAME      = 5;
-	const TYPE_MX         = 15;
-	const TYPE_TXT        = 16;
+
+	/**  DNS parameter constants
+	 *   Refer to IANA Domain Name System (DNS) Parameters
+	 *   https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
+	 */
+	
+	const CLASS_RESERVED  = 0;
+	const CLASS_INTERNET  = 1;
+	const CLASS_CHAOS     = 3;
+	const CLASS_HESIOD    = 4;
+
+	const TYPE_A          = 1;           // Address Record
+	const TYPE_AAAA       = 28;          // IPv6 Address Record
+	const TYPE_NS         = 2;           // Name Server Record
+	const TYPE_CNAME      = 5;           // Canonical Name Record
+	const TYPE_MX         = 15;          // Mail Exchange Record
+	const TYPE_TXT        = 16;          // Text Record
 
 	const OPCODE_QUERY    = 0;
 	const OPCODE_INVERSE  = 1;
@@ -17,15 +28,13 @@ class NameResolver {
 	const OPCODE_NOTIFY   = 4;
 	const OPCODE_UPDATE   = 5;
 
-	const RCODE_NOERROR   = 0;
-	const RCODE_FORMERR   = 1;
-	const RCODE_SERVFAI   = 2;
-	const RCODE_NXDOMAIN  = 3;
-	const RCODE_NOTIMP    = 4;
-	const RCODE_REFUSED   = 5;
+	const RCODE_NOERROR   = 0;           // No Error
+	const RCODE_FORMERR   = 1;           // Format Error
+	const RCODE_SERVFAI   = 2;           // Server Failure
+	const RCODE_NXDOMAIN  = 3;           // Non-Existent Domain
+	const RCODE_NOTIMP    = 4;           // Not Implemented
+	const RCODE_REFUSED   = 5;           // Query Refused
 	
-	
-	public static Array  $cache = [];
 	
 	public static function strtype(int $type): String {
 	
@@ -36,10 +45,9 @@ class NameResolver {
 		case NameResolver::TYPE_A      : $strtype = "A";     break;
 		case NameResolver::TYPE_AAAA   : $strtype = "AAAA";  break;
 		case NameResolver::TYPE_NS     : $strtype = "NS";    break;
-		case NameResolver::TYPE_CNAME  : $strtype = "CNAME"; break;
+		//case NameResolver::TYPE_CNAME  : $strtype = "CNAME"; break;
 		case NameResolver::TYPE_MX     : $strtype = "MX";    break;
 		case NameResolver::TYPE_TXT    : $strtype = "TXT";   break;
-		default : throw new \Exception("Unknown type");
 		
 		};
 		
@@ -85,106 +93,13 @@ class NameResolver {
 	
 	}
 	
-	public static function set_cache(String $name, Array $record): void {
-	
-		$record["SETTIME"] = time();
+	public static function resolve(Query $query, String $zone_files_dir): Answer {
 		
-		NameResolver::$cache[$name] = $record;
-	
-	}
-	
-	public static function search_cache(String $name): Array {
-		
-		$record = &NameResolver::$cache[$name];
-		
-		if ($record == null || !isset($record)) {
-			return [];
-		}
-		
-		if ((time() - (int)$record["SETTIME"]) > $record["TTL"]) {
-			unset($record);
-			return [];
-		}
-		
-		return $record;
-	
-	}
-	
-	public static function set_rdata(int $type, Array $record): String {
-	
+		$zone_file = realpath($zone_files_dir."/".$query->name);
+		$record = ($zone_file) ? NameResolver::parse_zone_file($zone_file) : "";
 		$rdata = "";
-		
-		switch ($type) {
-		
-		case NameResolver::TYPE_A      : 
-			$ip = $record["A"];
-			$part = explode(".", $ip);
-			for ($r = 0; $r < count($part); $r++) {
-				$rdata .= chr((int)$part[$r]);
-			}
-			
-			break;
-		
-		case NameResolver::TYPE_AAAA   : 
-			$ip = $record["AAAA"];
-			$part = explode(":", $ip);
-			for ($r = 0; $r < count($part); $r++) {
-				$rdata .= chr((int)$part[$r]);
-			}
-			
-			break;
-			
-		case NameResolver::TYPE_NS     : 
-			$part = explode(".", $record["NS"]);
-			for ($r = 0; $r < count($part); $r++) {
-				$part[$r] = trim($part[$r]);
-				$rdata .= chr(strlen($part[$r]));
-				$rdata .= $part[$r];
-			}
-			$rdata .= chr(0x00);
-			
-			break;
-			
-		case NameResolver::TYPE_MX     :
-			$rdata = chr(0x00).chr(0x0a);
-			$part = explode(".", $record["MX"]);
-			for ($r = 0; $r < count($part); $r++) {
-				$part[$r] = trim($part[$r]);
-				$rdata .= chr(strlen($part[$r]));
-				$rdata .= $part[$r];
-			}
-			$rdata .= chr(0x00);
-			
-			break;
-			
-		case NameResolver::TYPE_TXT    :
-			$record["TXT"] = trim($record["TXT"]);
-			$rdata = chr(strlen($record["TXT"])).$record["TXT"];
-				
-			break;
-		
-		};
-		
-		return $rdata;
-	
-	}
-	
-	public static function resolve(Header $query, String $zone_files): Header {
-	
-		$response = null;
-		$packet = "";
-		
-		$record = NameResolver::search_cache($query->name);
-		if (count($record) === 0) {
-			$file = $zone_files.DIRECTORY_SEPARATOR.$query->name;
-			
-			if (file_exists($file)) {
-				$record = NameResolver::parse_zone_file($file);
-				NameResolver::set_cache($query->name, $record);
-			} else {
-				
-			}
-			
+		if (isset($record[NameResolver::strtype($query->type)])) {
+			$rdata = $record[NameResolver::strtype($query->type)];
 		}
 		
 		$response = new Answer();
@@ -197,10 +112,23 @@ class NameResolver {
 		$response->flag_rd      = $query->flag_rd;
 		$response->flag_ra      = 0;                           // recursion not allowed
 		$response->flag_z       = 0;
-		$response->flag_rcode   = NameResolver::RCODE_NOERROR; // no error
+		$response->flag_rcode   = NameResolver::RCODE_NOERROR;
+		
+		if (!$zone_file) {
+			$response->flag_rcode = NameResolver::RCODE_NXDOMAIN;	
+		}
+		if (strlen(NameResolver::strtype($query->type)) === 0) {
+			$response->flag_rcode = NameResolver::RCODE_NOTIMP;	
+		}
+		if ($query->class !== NameResolver::CLASS_INTERNET) {
+			$response->flag_rcode = NameResolver::RCODE_NOTIMP;	
+		}
+		if ($response->flag_rcode === 0 && strlen($rdata) === 0) {
+			$response->flag_rcode = NameResolver::RCODE_REFUSED;
+		}
 		
 		$response->qdcount      = 1;
-		$response->ancount      = 1;
+		$response->ancount      = (!$response->flag_rcode) ? 1 : 0;
 		$response->nscount      = 0;
 		$response->arcount      = 0;
 		
@@ -208,10 +136,12 @@ class NameResolver {
 		$response->class        = $query->class;
 		$response->name         = $query->name;
 		
-		$response->ttl          = $record["TTL"];
-		$response->rdata        = NameResolver::set_rdata($query->type, $record);
-		$response->rdlength     = strlen($response->rdata);
-	
+		if (!$response->flag_rcode) {
+			$response->ttl          = $record["TTL"];
+			$response->rdata        = trim($rdata);
+			$response->rdlength     = 0;
+		}
+
 		return $response;
 	
 	}

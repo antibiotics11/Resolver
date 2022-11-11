@@ -8,10 +8,10 @@ A	127.100.100.1
 AAAA	::1
 
 # MX Record
-MX	smtp.abx
+MX	smtp.test
 
 # NS Record
-NS	ns.abx
+NS	ns.test
 
 # TXT Record
-TXT	abx. is top level domain
+TXT	test. is top level domain
