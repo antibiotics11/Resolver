@@ -1,6 +1,7 @@
 # Resolver
 
-DNS Server in PHP
+DNS Server in PHP. <br>
+PHP 8+ required.
 
 ## Supported record types
 
@@ -9,3 +10,8 @@ DNS Server in PHP
 - MX
 - NS
 - TXT
+
+## run
+```
+$ sudo php server.php
+```
