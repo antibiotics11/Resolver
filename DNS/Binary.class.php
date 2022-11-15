@@ -166,15 +166,17 @@ class Binary {
 		switch ($type) {
 		
 		case NameResolver::TYPE_A      :
+			/*
 			$field = explode(".", $rdata);
 			for ($r = 0; $r < count($field); $r++) {
 				$binary .= chr((int)$field[$r]);
 			}
-			
+			*/
+			$binary = inet_pton($rdata);
 			break;
 		
 		case NameResolver::TYPE_AAAA   :
-			
+			$binary = inet_pton($rdata);
 			break;
 			
 		case NameResolver::TYPE_NS     : 
