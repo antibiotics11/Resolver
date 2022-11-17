@@ -13,8 +13,8 @@ AAAA	::1
 MX	smtp.test
 
 # NS Record
-NS	ns-1.test
-NS	ns-2.test
+NS	ns1.test
+NS	ns2.test
 
 # TXT Record
 TXT	test. is top level domain
