@@ -2,7 +2,7 @@
 
 namespace Resolver;
 
-class Answer extends Query {
+class Answer {
 
 	public int     $ttl       = 3600;   // 3600s in default
 	

@@ -69,7 +69,7 @@ class Server {
 			);
 			
 			$packet = Binary::complete($answer);
-			
+
 			Logger::write_log(
 				$this->log_dir,
 				"[".$answer->id."] "

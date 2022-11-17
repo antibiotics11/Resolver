@@ -119,9 +119,12 @@ class Binary {
 			$packet .= $name.$type.$class;
 		
 		}
-		
-		if ($header instanceof Answer && $header->ancount) {
-		
+
+		for ($d = 0; $d < count($header->answer); $d++) {
+		//if ($header instanceof Answer && $header->ancount) {
+
+			$answer = $header->answer[$d];
+
 			$name = "";
 			$level = explode(".", $header->name);
 			for ($n = 0; $n < count($level); $n++) {
@@ -138,13 +141,13 @@ class Binary {
 			$class = chr(bindec(substr($class, 0, 8)))
 				.chr(bindec(substr($class, 8)));
 				
-			$ttl   = sprintf("%032d", decbin($header->ttl));
+			$ttl   = sprintf("%032d", decbin($answer->ttl));
 			$ttl   = chr(bindec(substr($ttl, 0, 8)))
 				.chr(bindec(substr($ttl, 8, 8)))
 				.chr(bindec(substr($ttl, 16, 8)))
 				.chr(bindec(substr($ttl, 24)));
 			
-			$rdata    = Binary::rdata_to_bin($header->type, $header->rdata);
+			$rdata    = Binary::rdata_to_bin($header->type, $answer->rdata);
 			
 			$rdlength = sprintf("%016d", decbin(strlen($rdata)));
 			$rdlength = chr(bindec(substr($rdlength, 0, 8)))

@@ -6,6 +6,7 @@ class NameResolver {
 
 
 	/**  DNS parameter constants
+	 *
 	 *   Refer to IANA Domain Name System (DNS) Parameters
 	 *   https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
 	 */
@@ -81,7 +82,7 @@ class NameResolver {
 			if (!isset($record[$type])) {
 				$record[$type] = [];
 			}
-			$record[$type] = $r[1];
+			$record[$type][] = $r[1];
 						
 		}
 		
@@ -93,16 +94,18 @@ class NameResolver {
 	
 	}
 	
-	public static function resolve(Query $query, String $zone_files_dir): Answer {
+	public static function resolve(Query $query, String $zone_files_dir): Query {
 		
 		$zone_file = realpath($zone_files_dir."/".$query->name);
 		$record = ($zone_file) ? NameResolver::parse_zone_file($zone_file) : "";
-		$rdata = "";
+		$rdata = [];
 		if (isset($record[NameResolver::strtype($query->type)])) {
 			$rdata = $record[NameResolver::strtype($query->type)];
 		}
+		//var_dump($rdata);
+		$rdata_count = count($rdata);
 		
-		$response = new Answer();
+		$response = new Query();
 		
 		$response->id           = $query->id;
 		$response->flag_qr      = 1;                           // is answer
@@ -123,23 +126,30 @@ class NameResolver {
 		if ($query->class !== NameResolver::CLASS_INTERNET) {
 			$response->flag_rcode = NameResolver::RCODE_NOTIMP;	
 		}
-		if ($response->flag_rcode === 0 && strlen($rdata) === 0) {
+		if ($response->flag_rcode === 0 && $rdata_count <= 0) {
 			$response->flag_rcode = NameResolver::RCODE_REFUSED;
 		}
 		
 		$response->qdcount      = 1;
-		$response->ancount      = (!$response->flag_rcode) ? 1 : 0;
+		$response->ancount      = 0;
+		if (!$resposne->flag_rcode) {
+			$response->ancount = $rdata_count;
+		}
 		$response->nscount      = 0;
 		$response->arcount      = 0;
-		
+
 		$response->type         = $query->type;
 		$response->class        = $query->class;
 		$response->name         = $query->name;
-		
+
+
 		if (!$response->flag_rcode) {
-			$response->ttl          = $record["TTL"];
-			$response->rdata        = trim($rdata);
-			$response->rdlength     = 0;
+			for ($d = 0; $d < $rdata_count; $d++) {
+				$response->answer[$d]   = new Answer();
+				$response->answer[$d]->ttl   = $record["TTL"];
+				$response->answer[$d]->rdata   = trim($rdata[$d]);
+				$response->answer[$d]->rdlength   = 0;
+			}
 		}
 
 		return $response;

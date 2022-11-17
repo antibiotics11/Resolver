@@ -8,4 +8,6 @@ class Query extends Header {
 	public int     $class  = 0;
 	public String  $name   = "";
 
+	public Array   $answer = [];
+
 };

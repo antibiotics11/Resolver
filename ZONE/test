@@ -3,6 +3,8 @@ TTL	3600
 
 # IPv4 Record
 A	127.100.100.1
+A	127.100.100.2
+A	127.100.100.3
 
 # IPv6 Record
 AAAA	::1
@@ -11,7 +13,8 @@ AAAA	::1
 MX	smtp.test
 
 # NS Record
-NS	ns.test
+NS	ns-1.test
+NS	ns-2.test
 
 # TXT Record
 TXT	test. is top level domain
