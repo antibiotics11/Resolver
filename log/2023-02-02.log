@@ -1,0 +1,11 @@
+[Thu, 02 Feb 2023 13:50:36 UTC]	Starting server at 127.0.0.1:53
+[Thu, 02 Feb 2023 13:50:42 UTC]	127.0.0.1#16294 Query A for test.net No Error
+[Thu, 02 Feb 2023 13:50:42 UTC]	127.0.0.1#10141 Query AAAA for test.net No Error
+[Thu, 02 Feb 2023 13:50:48 UTC]	127.0.0.1#10192 Query A for test.net No Error
+[Thu, 02 Feb 2023 13:50:48 UTC]	127.0.0.1#48172 Query AAAA for test.net No Error
+[Thu, 02 Feb 2023 13:50:53 UTC]	127.0.0.1#53929 Query A for google.com Non-Existent Domain
+[Thu, 02 Feb 2023 13:50:53 UTC]	127.0.0.1#429 Query AAAA for google.com Non-Existent Domain
+[Thu, 02 Feb 2023 13:50:53 UTC]	127.0.0.1#46837 Query A for google.com Non-Existent Domain
+[Thu, 02 Feb 2023 13:50:53 UTC]	127.0.0.1#57079 Query AAAA for google.com Non-Existent Domain
+[Thu, 02 Feb 2023 13:51:06 UTC]	127.0.0.1#64833 Query TXT for test.net No Error
+[Thu, 02 Feb 2023 13:51:10 UTC]	127.0.0.1#11976 Query MX for test.net No Error

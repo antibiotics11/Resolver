@@ -1,17 +1,19 @@
 # Resolver
 
-DNS Server in PHP. <br>
-PHP 8+ required.
+DNS server implementation in PHP. <br>
+PHP 8.1+ required. <br>
 
-## Supported record types
+```
+cd bin/
+sudo ./resolver
+```
+
+## Record Types
 
 - A
-- AAAA
-- MX
 - NS
+- CNAME
+- MX
 - TXT
+- AAAA
 
-## run
-```
-$ sudo php server.php
-```

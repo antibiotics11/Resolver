@@ -1,6 +1,7 @@
+#!/usr/bin/php
 <?php
 
-$name = "test";
+$name = readline(" name >> ");
 
 $a     = dns_get_record($name, DNS_A);
 $aaaa  = dns_get_record($name, DNS_AAAA);
