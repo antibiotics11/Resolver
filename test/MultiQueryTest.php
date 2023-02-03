@@ -15,18 +15,9 @@ use Resolver\Message as Message;
 
 $id = 12345;
 $targets = Request::EXTERNAL_SERVERS;
-$types = [ 
-	Message\Types::A->value, 
-	Message\Types::NS->value,
-	Message\Types::CNAME->value,
-	Message\Types::MX->value,
-	Message\Types::TXT->value,
-	Message\Types::AAAA->value,
-	Message\Types::ALL->value,
-];
+$targets[] = [ "127.0.0.53", 53, "Stub Resolver" ];
 
 foreach ($targets as $ns) {
-	for ($i = 0; $i < count($types); $i++) {
 	
 		$id += 100;
 		$request = new Resolver\Client\RequestSender();
@@ -34,13 +25,40 @@ foreach ($targets as $ns) {
 		$request->setTargetInfo(address: $ns[0], port: $ns[1]);
 		$request->setTransactionId($id);
 		$request->setFlagRD(0);
+		
+		// Requesting multiple types of records in single message.
 		$request->setQuery(
 			name:  "google.com", 
-			type:  $types[$i],
+			type:  Message\Types::A->value,
+			class: Message\Classes::INTERNET->value
+		);
+		$request->setQuery(
+			name:  "google.com", 
+			type:  Message\Types::NS->value,
+			class: Message\Classes::INTERNET->value
+		);
+		$request->setQuery(
+			name:  "google.com", 
+			type:  Message\Types::CNAME->value,
+			class: Message\Classes::INTERNET->value
+		);
+		$request->setQuery(
+			name:  "google.com", 
+			type:  Message\Types::MX->value,
+			class: Message\Classes::INTERNET->value
+		);
+		$request->setQuery(
+			name:  "google.com", 
+			type:  Message\Types::TXT->value,
+			class: Message\Classes::INTERNET->value
+		);
+		$request->setQuery(
+			name:  "google.com", 
+			type:  Message\Types::AAAA->value,
 			class: Message\Classes::INTERNET->value
 		);
 		
-		printf("### Sending Query %s to %s...\r\n", Message\Types::from($types[$i])->name, $ns[2]);
+		printf("### Sending Query to %s...\r\n", $ns[2]);
 		
 		$packet = $request->pack();
 		printf("### Query =>\t%s\r\n", bin2hex($packet));
@@ -48,6 +66,5 @@ foreach ($targets as $ns) {
 		$buffer = $request->send();
 		printf("### Answer =>\t%s\r\n", bin2hex($buffer));
 		printf("\r\n");
-		
-	}
+
 }
