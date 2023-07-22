@@ -4,23 +4,26 @@ namespace Resolver\System;
 
 class Time {
 
-	public static function setTimezone(String $timezone): String {
-		
-		date_default_timezone_set($timezone);
-		return date_default_timezone_get();
-		
-	}
+  public static function setTimeZone(String $timezone = "GMT"): void {
+    date_default_timezone_set($timezone);
+  }
 
-	public static function DateYMD(String $separator = "-"): String {
+  public static function getTimeZone(): String {
+    return date_default_timezone_get();
+  }
 
-		return date("Y".$separator."m".$separator."d");
-	
-	}
+  public static function DateYMD(String $separator = "-", ?int $timestamp = null): String {
+    return date(sprintf("Y%sm%sd", $separator, $separator), $timestamp ?? time());
+  }
 
-	public static function DateRFC2822(): String {
+  // Formats given timestamp as a date string in RFC2822 format. (current time in default)
+  public static function DateRFC2822(?int $timestamp = null): String {
+    return date(DATE_RFC2822, $timestamp ?? time());
+  }
 
-		return substr(date(DATE_RFC2822), 0, -5).date("T");
-	
-	}
+  // Formats given timestamp as a date string in RFC7231 format. (current time in default)
+  public static function DateRFC7231(?int $timestamp = null): String {
+    return date(DATE_RFC7231, $timestamp ?? time());
+  }
 
 };
